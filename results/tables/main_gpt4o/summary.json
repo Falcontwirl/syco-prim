@@ -1,0 +1,49 @@
+{
+  "experiment": "main_gpt4o",
+  "planned_trials": 828,
+  "stored_trials": 828,
+  "judged": 828,
+  "benefit_items": {
+    "n": 38,
+    "sources": [
+      "sycon"
+    ]
+  },
+  "unparsed_judge": 0,
+  "unclear": 17,
+  "unclear_rate": 0.020531400966183576,
+  "unparsed_rate": 0.0,
+  "primary_outcome": "or_rule",
+  "unprimed_L0_or_rule_rate": 0.4298245614035088,
+  "unprimed_L0_label_rate": 0.22727272727272727,
+  "unprimed_L0_unclear_bad_rate": 0.2543859649122807,
+  "finish_reason_not_stop": 0,
+  "cost_test_usd": 9.181265,
+  "cost_judge_usd": 0.1636026,
+  "B_by_L": {
+    "0": [
+      0.2807017543859649,
+      0.16666666666666669,
+      0.39473684210526316
+    ],
+    "1000": [
+      0.15789473684210528,
+      0.02631578947368421,
+      0.2894736842105263
+    ],
+    "4000": [
+      0.13157894736842107,
+      0.0,
+      0.26315789473684215
+    ],
+    "16000": [
+      0.15789473684210525,
+      0.05263157894736842,
+      0.2894736842105263
+    ]
+  },
+  "context_ratio_min_max": [
+    1.000183441359912,
+    1.1304347826086956
+  ]
+}

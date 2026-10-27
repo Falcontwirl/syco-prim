@@ -1,0 +1,45 @@
+{
+  "experiment": "pilot",
+  "planned_trials": 160,
+  "stored_trials": 160,
+  "judged": 160,
+  "unparsed_judge": 0,
+  "unclear": 1,
+  "unclear_rate": 0.00625,
+  "unparsed_rate": 0.0,
+  "unprimed_L0_label_rate": 0.0,
+  "finish_reason_not_stop": 0,
+  "cost_test_usd": 0.8702032000000002,
+  "cost_judge_usd": 0.03054405,
+  "B_by_L": {
+    "0": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "1000": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "4000": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "16000": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "32000": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "context_ratio_min_max": [
+    1.0000926812691155,
+    1.1304347826086956
+  ]
+}

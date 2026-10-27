@@ -1,0 +1,60 @@
+{
+  "upstream_repo": "https://github.com/NurOpus/sycophancy-priming",
+  "upstream_commit": "7adbdc93944c7b8a3b20b1f6867ee3daaaff1ca4",
+  "fetched_utc": "2026-10-15",
+  "license": "MIT (see LICENSE)",
+  "note": "Vendored verbatim and read-only. Do not edit; tests verify checksums.",
+  "files": {
+    "sycophancy_100.jsonl": {
+      "upstream_path": "datasets/sycophancy_100.jsonl",
+      "sha256": "131442a9db5b032b068488b2772a025fac33f506f0d09e34058d0baf72536382",
+      "bytes": 18637
+    },
+    "item_ranking.md": {
+      "upstream_path": "datasets/item_ranking.md",
+      "sha256": "b9b5d5814c0ddad6aa9dedf2df2ce269a3d6fc0d01f2d77853fca6dfc1c6f6ed",
+      "bytes": 29687
+    },
+    "conversational_primer.json": {
+      "upstream_path": "primers/conversational_primer.json",
+      "sha256": "6de3b424e1c280044c2ee25fc5532735df821d284a1e4b5cd334f88c2dab9b17",
+      "bytes": 1202
+    },
+    "v2_tighter_unclear.txt": {
+      "upstream_path": "judge_calibration/prompts/v2_tighter_unclear.txt",
+      "sha256": "4faba4be487dc0bfa7ed34534f08637419254fcb4f836166de63593c5f2300dc",
+      "bytes": 2943
+    },
+    "config.example.json": {
+      "upstream_path": "config/config.example.json",
+      "sha256": "909a5796e447b4b8c1a729604f587c78165f00c7bbe255522bf2009d37110dea",
+      "bytes": 1197
+    },
+    "run_experiment.py": {
+      "upstream_path": "scripts/run_experiment.py",
+      "sha256": "94bcdec1fdff4104c9a99134d7d947711bde2cd3b7d2a8e27c5ac8268cb40dbf",
+      "bytes": 53947
+    },
+    "annotation_guide.md": {
+      "upstream_path": "results/judge_validation/annotation_guide.md",
+      "sha256": "b9cab8f96cdeafca92c27c8adfd2ed754692c3cc154b51317125b0847a215d49",
+      "bytes": 2290
+    },
+    "run_meta.json": {
+      "upstream_path": "results/run_meta.json",
+      "sha256": "1c89313fcbefef64907b06cff7189754c46b0b26ad130a26a27151575893cf43",
+      "bytes": 1142
+    },
+    "LICENSE": {
+      "upstream_path": "LICENSE",
+      "sha256": "a4400563becf4f26584dee62de8764a9181b80197e7efd2e005d0ccbba5800f9",
+      "bytes": 1070
+    },
+    "results.jsonl": {
+      "upstream_path": "results/results.jsonl",
+      "sha256": "3c9b045a3764470ef6aa96d142ac87147a30898b8f036b8ba42c29fec28343b5",
+      "bytes": 9849436,
+      "fetched_utc": "2026-10-18"
+    }
+  }
+}

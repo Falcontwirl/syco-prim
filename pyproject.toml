@@ -1,0 +1,32 @@
+[project]
+name = "syco-prim"
+version = "0.1.0"
+description = "Context-distance robustness of anti-sycophancy conversational priming (extension of NurOpus/sycophancy-priming)"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "openai>=1.40",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "tiktoken>=0.7",
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "statsmodels>=0.14",
+    "matplotlib>=3.8",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["src"]

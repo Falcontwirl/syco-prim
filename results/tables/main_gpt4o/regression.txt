@@ -1,0 +1,161 @@
+Outcome: or_rule; n = 456 trials, 38 question clusters
+
+== Primary: y ~ primed * C(L)  (logit, GEE exchangeable, robust SE) ==
+                               GEE Regression Results                              
+===================================================================================
+Dep. Variable:                           y   No. Observations:                  456
+Model:                                 GEE   No. clusters:                       38
+Method:                        Generalized   Min. cluster size:                  12
+                      Estimating Equations   Max. cluster size:                  12
+Family:                           Binomial   Mean cluster size:                12.0
+Dependence structure:         Exchangeable   Num. iterations:                     2
+Date:                     Mon, 26 Oct 2026   Scale:                           1.000
+Covariance type:                    robust   Time:                         14:45:34
+========================================================================================
+                           coef    std err          z      P>|z|      [0.025      0.975]
+----------------------------------------------------------------------------------------
+Intercept               -0.2826      0.277     -1.021      0.307      -0.825       0.260
+C(L)[T.1000]            -0.1449      0.308     -0.470      0.638      -0.749       0.459
+C(L)[T.4000]             0.0713      0.289      0.247      0.805      -0.495       0.637
+C(L)[T.16000]            0.1772      0.265      0.668      0.504      -0.343       0.697
+primed                  -1.4589      0.335     -4.350      0.000      -2.116      -0.802
+primed:C(L)[T.1000]      0.7163      0.357      2.009      0.045       0.017       1.415
+primed:C(L)[T.4000]      0.8970      0.366      2.450      0.014       0.179       1.615
+primed:C(L)[T.16000]     0.7911      0.396      1.996      0.046       0.014       1.568
+==============================================================================
+Skew:                          0.6395   Kurtosis:                      -1.3014
+Centered skew:                 0.5334   Centered kurtosis:              0.5009
+==============================================================================
+
+Joint Wald test, all primed x C(L) interactions = 0: chi2 = 7.247, df = 3, p = 0.06442
+
+== Secondary trend (L > 0): y ~ primed * log(actual filler tokens) ==
+                               GEE Regression Results                              
+===================================================================================
+Dep. Variable:                           y   No. Observations:                  228
+Model:                                 GEE   No. clusters:                       38
+Method:                        Generalized   Min. cluster size:                   6
+                      Estimating Equations   Max. cluster size:                   6
+Family:                           Binomial   Mean cluster size:                 6.0
+Dependence structure:         Exchangeable   Num. iterations:                     5
+Date:                     Mon, 26 Oct 2026   Scale:                           1.000
+Covariance type:                    robust   Time:                         14:45:34
+=====================================================================================
+                        coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------
+Intercept            -1.2003      0.886     -1.354      0.176      -2.937       0.537
+primed               -0.9176      1.314     -0.698      0.485      -3.493       1.658
+log_tokens            0.1150      0.101      1.138      0.255      -0.083       0.313
+primed:log_tokens     0.0316      0.151      0.209      0.834      -0.264       0.328
+==============================================================================
+Skew:                          0.5389   Kurtosis:                      -1.5843
+Centered skew:                 0.3422   Centered kurtosis:              2.4433
+==============================================================================
+
+Outcome: label; n = 443 trials, 38 question clusters
+
+== Primary: y ~ primed * C(L)  (logit, GEE exchangeable, robust SE) ==
+                               GEE Regression Results                              
+===================================================================================
+Dep. Variable:                           y   No. Observations:                  443
+Model:                                 GEE   No. clusters:                       38
+Method:                        Generalized   Min. cluster size:                   7
+                      Estimating Equations   Max. cluster size:                  12
+Family:                           Binomial   Mean cluster size:                11.7
+Dependence structure:         Exchangeable   Num. iterations:                     6
+Date:                     Mon, 26 Oct 2026   Scale:                           1.000
+Covariance type:                    robust   Time:                         14:45:34
+========================================================================================
+                           coef    std err          z      P>|z|      [0.025      0.975]
+----------------------------------------------------------------------------------------
+Intercept               -1.2039      0.357     -3.369      0.001      -1.904      -0.504
+C(L)[T.1000]             0.0578      0.328      0.176      0.860      -0.585       0.701
+C(L)[T.4000]             0.3060      0.264      1.157      0.247      -0.212       0.824
+C(L)[T.16000]            0.1999      0.343      0.583      0.560      -0.472       0.872
+primed                  -0.6670      0.264     -2.531      0.011      -1.184      -0.150
+primed:C(L)[T.1000]      0.7196      0.358      2.010      0.044       0.018       1.421
+primed:C(L)[T.4000]      0.6756      0.424      1.593      0.111      -0.156       1.507
+primed:C(L)[T.16000]     0.5009      0.444      1.127      0.260      -0.370       1.372
+==============================================================================
+Skew:                          1.3021   Kurtosis:                      -0.2063
+Centered skew:                 1.1795   Centered kurtosis:              4.4378
+==============================================================================
+
+Joint Wald test, all primed x C(L) interactions = 0: chi2 = 4.718, df = 3, p = 0.1936
+
+== Secondary trend (L > 0): y ~ primed * log(actual filler tokens) ==
+                               GEE Regression Results                              
+===================================================================================
+Dep. Variable:                           y   No. Observations:                  221
+Model:                                 GEE   No. clusters:                       38
+Method:                        Generalized   Min. cluster size:                   3
+                      Estimating Equations   Max. cluster size:                   6
+Family:                           Binomial   Mean cluster size:                 5.8
+Dependence structure:         Exchangeable   Num. iterations:                     4
+Date:                     Mon, 26 Oct 2026   Scale:                           1.000
+Covariance type:                    robust   Time:                         14:45:34
+=====================================================================================
+                        coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------
+Intercept            -1.4297      0.987     -1.449      0.147      -3.364       0.505
+primed                0.6603      1.232      0.536      0.592      -1.754       3.075
+log_tokens            0.0517      0.111      0.467      0.640      -0.165       0.268
+primed:log_tokens    -0.0841      0.161     -0.522      0.602      -0.400       0.232
+==============================================================================
+Skew:                          1.0526   Kurtosis:                      -0.8892
+Centered skew:                 1.0059   Centered kurtosis:              3.6399
+==============================================================================
+
+Outcome: unclear_bad; n = 456 trials, 38 question clusters
+
+== Primary: y ~ primed * C(L)  (logit, GEE exchangeable, robust SE) ==
+                               GEE Regression Results                              
+===================================================================================
+Dep. Variable:                           y   No. Observations:                  456
+Model:                                 GEE   No. clusters:                       38
+Method:                        Generalized   Min. cluster size:                  12
+                      Estimating Equations   Max. cluster size:                  12
+Family:                           Binomial   Mean cluster size:                12.0
+Dependence structure:         Exchangeable   Num. iterations:                     2
+Date:                     Mon, 26 Oct 2026   Scale:                           1.000
+Covariance type:                    robust   Time:                         14:45:34
+========================================================================================
+                           coef    std err          z      P>|z|      [0.025      0.975]
+----------------------------------------------------------------------------------------
+Intercept               -1.0754      0.336     -3.198      0.001      -1.734      -0.416
+C(L)[T.1000]             0.0457      0.306      0.150      0.881      -0.554       0.645
+C(L)[T.4000]             0.1774      0.237      0.747      0.455      -0.288       0.643
+C(L)[T.16000]            0.1774      0.303      0.585      0.558      -0.417       0.771
+primed                  -0.7370      0.254     -2.901      0.004      -1.235      -0.239
+primed:C(L)[T.1000]      1.1127      0.397      2.803      0.005       0.335       1.891
+primed:C(L)[T.4000]      0.8618      0.403      2.138      0.033       0.072       1.652
+primed:C(L)[T.16000]     0.4649      0.407      1.143      0.253      -0.332       1.262
+==============================================================================
+Skew:                          1.1481   Kurtosis:                      -0.5609
+Centered skew:                 1.0631   Centered kurtosis:              3.1502
+==============================================================================
+
+Joint Wald test, all primed x C(L) interactions = 0: chi2 = 8.902, df = 3, p = 0.03062
+
+== Secondary trend (L > 0): y ~ primed * log(actual filler tokens) ==
+                               GEE Regression Results                              
+===================================================================================
+Dep. Variable:                           y   No. Observations:                  228
+Model:                                 GEE   No. clusters:                       38
+Method:                        Generalized   Min. cluster size:                   6
+                      Estimating Equations   Max. cluster size:                   6
+Family:                           Binomial   Mean cluster size:                 6.0
+Dependence structure:         Exchangeable   Num. iterations:                     4
+Date:                     Mon, 26 Oct 2026   Scale:                           1.000
+Covariance type:                    robust   Time:                         14:45:34
+=====================================================================================
+                        coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------
+Intercept            -1.3411      0.941     -1.425      0.154      -3.186       0.504
+primed                1.9082      1.285      1.484      0.138      -0.611       4.428
+log_tokens            0.0483      0.105      0.462      0.644      -0.157       0.253
+primed:log_tokens    -0.2207      0.165     -1.337      0.181      -0.544       0.103
+==============================================================================
+Skew:                          0.9217   Kurtosis:                      -1.1271
+Centered skew:                 0.8954   Centered kurtosis:              2.6078
+==============================================================================

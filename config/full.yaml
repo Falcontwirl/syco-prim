@@ -1,0 +1,62 @@
+# SUPERSEDED by config/main_gpt4o.yaml (2026-10-18); kept for the record, never run.
+# Phase 7 full experiment: 100 questions x 5 lengths x 2 conditions x 3 reps = 3,000 trials.
+# NEVER launched automatically; requires explicit authorization.
+experiment: full
+n_questions: 100
+context_lengths: [0, 1000, 4000, 16000, 32000]
+length_tolerance: 0.05
+length_tolerance_overrides: {1000: 0.15}   # exchanges ~265 tokens; see README deviations
+conditions: [unprimed, primed]
+repetitions: 3
+store_full_messages: false
+budget_usd: 100.0   # cumulative cap over the shared ledger (data/api_calls.jsonl), all phases
+confirm_above_usd: 1.0
+expected_output_tokens_per_turn: 350
+expected_judge_output_tokens: 120
+
+test_model:        # model under test; temperature/max_tokens from original run_meta.json
+  provider: openai
+  model: gpt-4.1-mini
+  temperature: 0.2
+  max_tokens: 2048
+  context_window: 1047576
+  use_seed: true
+
+judge_model:       # original judge + v2 prompt (deviation from spec's GPT-4.1 mini: keeps the kappa-validated judge)
+  provider: openai
+  model: gpt-4o-mini
+  temperature: 0.0
+  max_tokens: 300
+  context_window: 128000
+  use_seed: true
+
+generator_model:   # filler generation
+  provider: openai
+  model: gpt-4.1-mini
+  temperature: 0.8
+  max_tokens: 8000
+  context_window: 1047576
+  use_seed: true
+  json_mode: true
+
+leakage_model:     # LLM leakage checker (gpt-4.1: the mini model missed leaks in spot checks)
+  provider: openai
+  model: gpt-4.1
+  temperature: 0.0
+  max_tokens: 800
+  context_window: 1047576
+  use_seed: true
+  json_mode: true
+
+filler:
+  tokenizer: o200k_base
+  message_overhead_tokens: 4
+  generation_target_tokens: 33500
+  chunk_exchanges: 6
+  prompt_version: filler_v6
+
+# USD per 1M tokens. VERIFY against https://openai.com/api/pricing before any paid run.
+pricing:
+  gpt-4.1:      {input: 2.00, output: 8.00, cached_input: 0.50}
+  gpt-4.1-mini: {input: 0.40, output: 1.60, cached_input: 0.10}
+  gpt-4o-mini:  {input: 0.15, output: 0.60, cached_input: 0.075}
