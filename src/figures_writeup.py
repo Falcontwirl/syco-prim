@@ -3,7 +3,7 @@ comparison that motivated them. Reads stored judge records only (no API calls).
 
     python -m src.figures_writeup --config config/main_gpt4o.yaml
 
-Writes results/figures/<experiment>/writeup/fig{1..4}_*.png. Colour roles follow analyze.py:
+Writes results/figures/<experiment>/writeup/fig{0..5}_*.png. Colour roles follow analyze.py:
 blue/orange always mean primed/unprimed; per-judge series are small multiples or dot plots in ink,
 so no extra categorical hues are introduced.
 """
@@ -11,15 +11,23 @@ so no extra categorical hues are introduced.
 from __future__ import annotations
 
 import argparse
+import textwrap
 
 import numpy as np
 import pandas as pd
 
 from src import analyze as A
+from src import original
 from src.config import load_config
 from src.generate_filler import select_questions
+from src.schemas import JudgeRecord, Trial
+from src.utils import JsonlStore
 
 NEGATIONS = {"not", "can't", "cannot", "no", "don't", "doesn't", "isn't", "won't", "wouldn't", "never"}
+# q037, primed, L = 0: a short, unambiguous correction ("Actually, elevators can cause...") that the
+# original judge labelled sycophantic and both other judges labelled resistant.
+EXAMPLE_TRIAL = "9bdaac7fecff4036"
+USER_FILL = "#f3f2ef"
 
 
 def is_negated(premise: str) -> bool:
@@ -34,8 +42,8 @@ def _save(fig, path) -> None:
     plt.close(fig)
 
 
-def fig_rates(boot: pd.DataFrame, lengths: list[int], path) -> None:
-    """Sycophancy rate vs L, primed vs unprimed, majority labels (OR rule)."""
+def fig_rates(boot: pd.DataFrame, lengths: list[int], counts: dict[tuple[str, int], tuple[int, int]], path) -> None:
+    """Sycophancy rate vs L, primed vs unprimed, majority labels (OR rule), each point labelled k/n."""
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(figsize=(6.4, 4))
@@ -45,13 +53,126 @@ def fig_rates(boot: pd.DataFrame, lengths: list[int], path) -> None:
         lo, hi = boot[f"S_{cond}_lo"].to_numpy(), boot[f"S_{cond}_hi"].to_numpy()
         ax.errorbar(x + dx, y, yerr=[y - lo, hi - y], color=A.COLOR[cond], lw=2, marker="o", ms=8, capsize=3,
                     label=cond, markeredgecolor="white", markeredgewidth=2)
+        # Unprimed labels sit left of each pair, primed right; each is nudged away from the line segment
+        # on its side so the text never sits on the line.
+        left = cond == "unprimed"
+        for i, (xi, yi, L) in enumerate(zip(x + dx, y, lengths)):
+            k, n = counts[(cond, L)]
+            j = i - 1 if left else i + 1
+            dy = 0 if not 0 <= j < len(y) else (-7 if y[j] > yi else 7)
+            ax.annotate(f"{k}/{n}", (xi, yi), xytext=(-9 if left else 9, dy), textcoords="offset points",
+                        ha="right" if left else "left", va="center", color=A.INK2, fontsize=8)
     ax.set_xticks(x, A._xlabels(lengths))
     ax.set_xlabel("Intervening conversation (target tokens)", color=A.INK2)
     ax.set_ylim(0, 0.35)
     ax.yaxis.set_major_formatter(lambda v, _: f"{v:.0%}")
     ax.legend(frameon=False, loc="upper right")
-    A._style(ax, "Sycophancy rate by context length (majority-of-three judges)", "Sycophantic trials (95% CI)")
+    A._style(ax, "Sycophancy rate by context length (majority-of-three judges)",
+             "Sycophantic trials (95% CI; labels: k/n)")
     _save(fig, path)
+
+
+def fig_design(path) -> None:
+    """Schematic of one trial in each arm. Every block except the primer is identical across arms."""
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import FancyBboxPatch
+
+    steps = [("System prompt", 1.6, "user"), ("Primer\n(8 messages)", 1.6, "primer"),
+             ("Filler conversation\n0 / 1k / 4k / 16k tokens", 2.9, "user"), ("False claim", 1.4, "user"),
+             ("Reply 1", 1.1, "model"), ("Pushback", 1.3, "user"), ("Reply 2", 1.1, "model")]
+    gap, h, x0 = 0.15, 0.8, 1.9
+    fig, ax = plt.subplots(figsize=(11, 3.3))
+
+    def box(x, y, w, text, face, edge, ls="-", color=A.INK):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.08", fc=face, ec=edge,
+                                    lw=1.2, ls=ls))
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=9, color=color)
+
+    for cond, y in (("primed", 2.0), ("unprimed", 0.6)):
+        ax.scatter([0.2], [y + h / 2], s=70, color=A.COLOR[cond], edgecolor="white", linewidth=2, zorder=3)
+        ax.text(0.38, y + h / 2, cond, ha="left", va="center", fontsize=10, color=A.INK, fontweight="bold")
+        x = x0
+        for text, w, kind in steps:
+            if kind == "primer" and cond == "unprimed":
+                box(x, y, w, "(no primer)", "white", A.NEUTRAL[1], ls="--", color=A.INK2)
+            elif kind == "primer":
+                box(x, y, w, text, "#dde9f8", A.COLOR["primed"])
+            elif kind == "model":
+                box(x, y, w, text, "white", A.INK2)
+            else:
+                box(x, y, w, text, USER_FILL, A.GRID)
+            if text.startswith("Filler") and cond == "primed":
+                ax.annotate("", (x + w / 2, 1.42), (x + w / 2, 1.98),
+                            arrowprops=dict(arrowstyle="<->", color=A.INK2, lw=1))
+                ax.text(x + w / 2 + 0.08, 1.7, "same filler in both arms", fontsize=8, color=A.INK2, va="center")
+            x += w + gap
+        ax.annotate("", (x + 0.25, y + h / 2), (x - gap + 0.02, y + h / 2),
+                    arrowprops=dict(arrowstyle="->", color=A.INK2, lw=1))
+    jx = x + 0.3
+    ax.add_patch(FancyBboxPatch((jx, 0.6), 2.3, 2.2, boxstyle="round,pad=0,rounding_size=0.08", fc="white",
+                                ec=A.INK2, lw=1.2))
+    ax.text(jx + 1.15, 1.7, "Judge\n(GPT-4o-mini,\npaper's prompt)\nreads replies 1 and 2\n\nsycophantic /\nresistant / unclear",
+            ha="center", va="center", fontsize=9, color=A.INK)
+    ax.text(x0, 0.2, "Grey: fixed text from the paper or our filler.   White: generated by GPT-4o (the model under test).",
+            fontsize=8, color=A.INK2, va="center")
+    ax.text(x0, -0.15, "Priming benefit at each filler length:  B(L) = S_unprimed(L) − S_primed(L)",
+            fontsize=9, color=A.INK, va="center")
+    ax.set_xlim(0, jx + 2.4)
+    ax.set_ylim(-0.4, 3.2)
+    ax.axis("off")
+    ax.set_title("One trial, in each arm", loc="left", fontsize=11, color=A.INK)
+    _save(fig, path)
+
+
+def fig_example(trial: Trial, prompt: str, false_premise: str, verdicts: list[tuple[str, str, str]], path) -> None:
+    """One trial as a chat transcript, with each judge's label and rationale underneath."""
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import FancyBboxPatch
+
+    W, lh, pad = 8.0, 0.2, 0.12  # inches; lh = line height at 10 pt
+    turns = [("User", prompt, "user"), ("GPT-4o, reply 1", trial.response_turn_1, "model"),
+             ("User (pushback)", original.pushback_prompt(), "user"),
+             ("GPT-4o, reply 2", trial.response_turn_2, "model")]
+    wrapped = [(who, textwrap.wrap(" ".join(text.split()), 78), kind) for who, text, kind in turns]
+    rows = [(j, v, textwrap.wrap(r, 58)) for j, v, r in verdicts]
+    H = (0.95 + sum(0.25 + len(ls) * lh + 2 * pad + 0.12 for _, ls, _ in wrapped)
+         + 0.55 + sum(max(1, len(r)) * 0.18 + 0.14 for _, _, r in rows) + 0.2)
+    fig = plt.figure(figsize=(W, H))
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, W)
+    ax.set_ylim(H, 0)
+    ax.axis("off")
+
+    y = 0.3
+    ax.text(0.4, y, "The paper's judge scores a correction as agreement", fontsize=12, color=A.INK, va="top")
+    y += 0.32
+    ax.text(0.4, y, f"Item {trial.question_id} · {trial.condition} · no filler · false claim: “{false_premise}”",
+            fontsize=8.5, color=A.INK2, va="top")
+    y += 0.33
+    for who, lines, kind in wrapped:
+        x = 0.4 if kind == "user" else 1.4
+        ax.text(x, y, who, fontsize=8.5, color=A.INK2, va="top")
+        y += 0.25
+        bh = len(lines) * lh + 2 * pad
+        ax.add_patch(FancyBboxPatch((x, y), W - 1.8, bh, boxstyle="round,pad=0,rounding_size=0.08",
+                                    fc=USER_FILL if kind == "user" else "white",
+                                    ec=A.GRID if kind == "user" else A.INK2, lw=1))
+        ax.text(x + 0.15, y + pad, "\n".join(lines), fontsize=10, color=A.INK, va="top", linespacing=1.4)
+        y += bh + 0.12
+    y += 0.15
+    ax.text(0.4, y, "Judge", fontsize=8.5, color=A.INK2, va="top")
+    ax.text(2.4, y, "Label", fontsize=8.5, color=A.INK2, va="top")
+    ax.text(3.6, y, "Rationale (verbatim)", fontsize=8.5, color=A.INK2, va="top")
+    y += 0.25
+    ax.plot([0.4, W - 0.4], [y, y], color=A.GRID, lw=1)
+    y += 0.1
+    for judge, label, r in rows:
+        ax.text(0.4, y, judge, fontsize=9, color=A.INK, va="top")
+        ax.text(2.4, y, label, fontsize=9, color=A.INK, va="top", fontweight="bold")
+        ax.text(3.6, y, "\n".join(r), fontsize=9, color=A.INK2, va="top", linespacing=1.3)
+        y += max(1, len(r)) * 0.18 + 0.14
+    fig.savefig(path, dpi=200)
+    plt.close(fig)
 
 
 def fig_benefit_by_judge(boots: dict[str, pd.DataFrame], lengths: list[int], path) -> None:
@@ -94,7 +215,7 @@ def fig_l0_vs_paper(rows: list[tuple[str, float, float]], path) -> None:
     ax.xaxis.set_major_formatter(lambda v, _: f"{v:.0%}")
     ax.set_xlabel("Sycophantic trials, OR rule (GPT-4o, no filler, 80 SYCON items)", color=A.INK2)
     ax.legend(frameon=False, loc="lower right")
-    A._style(ax, "The paper's L = 0 effect shrinks once the judge is checked", "")
+    A._style(ax, "The paper's L = 0 effect shrinks once responses are re-judged", "")
     ax.grid(axis="y", visible=False)
     ax.grid(axis="x", color=A.GRID, linewidth=0.8)
     _save(fig, path)
@@ -165,7 +286,10 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
 
     boot = {k: A.cluster_bootstrap(d, "or_rule", lengths) for k, d in core.items()}
-    fig_rates(boot["majority"], lengths, out / "fig1_rates_majority.png")
+    tally = A.outcome_columns(core["majority"]).groupby(["condition", "L"])[["or_rule_num", "or_rule_den"]].sum()
+    counts = {key: (int(r.or_rule_num), int(r.or_rule_den)) for key, r in tally.iterrows()}
+    fig_design(out / "fig0_design.png")
+    fig_rates(boot["majority"], lengths, counts, out / "fig1_rates_majority.png")
     fig_benefit_by_judge({f"Original judge\n({cfg.judge_model.model})": boot["original"],
                           f"Second judge\n({cfg.second_judge_model})": boot["second"],
                           f"Majority of three\n(+ {cfg.tiebreak_judge_model.model} tie-break)": boot["majority"]},
@@ -193,6 +317,17 @@ def main() -> None:
                {"label": (tsum["label_sided_with_a"], tsum["label_sided_with_b"], tsum["label_sided_with_neither"]),
                 "OR rule": (tsum["or_rule_sided_with_a"], tsum["or_rule_sided_with_b"], 0)},
                out / "fig4_judge_disagreement.png")
+
+    trial = next(t for t in JsonlStore(cfg.data_path / "trials.jsonl", "trial_id").load(Trial)
+                 if t.trial_id == EXAMPLE_TRIAL)
+    q = next(q for q in select_questions(cfg) if q.id == trial.question_id)
+    judged = {r.judge_model: r.parsed for r in JsonlStore(cfg.data_path / "judge_results.jsonl", "judge_id").load(JudgeRecord)
+              if r.trial_id == EXAMPLE_TRIAL and r.parsed}
+    names = ((cfg.judge_model.model, "(paper's judge)"), (cfg.second_judge_model, "(second)"),
+             (cfg.tiebreak_judge_model.model, "(tie-break)"))
+    fig_example(trial, q.prompt, q.false_premise,
+                [(f"{m} {role}", judged[m].label, judged[m].rationale) for m, role in names],
+                out / "fig5_example_q037.png")
     print(f"figures -> {out}")
 
 

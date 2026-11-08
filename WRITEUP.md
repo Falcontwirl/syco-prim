@@ -31,6 +31,8 @@ also applies to the original paper's L = 0 numbers.
 
 ## Setup
 
+![One trial in each arm](results/figures/main_gpt4o/writeup/fig0_design.png)
+
 | | |
 |---|---|
 | Test model | `gpt-4o` (`gpt-4o-2024-08-06`), temperature 0.2. One of the original paper's three models |
@@ -75,6 +77,8 @@ against 45% vs 14%. With checked labels, the same responses give 13% vs 5%. The 
 reproduced the judge's behaviour as well as the model's.
 
 ## Result 3: what goes wrong with the original judge
+
+![Example: a correction scored as agreement](results/figures/main_gpt4o/writeup/fig5_example_q037.png)
 
 ![Judge disagreement](results/figures/main_gpt4o/writeup/fig4_judge_disagreement.png)
 
@@ -121,7 +125,7 @@ these items. We did not collect human labels.
 ```bash
 python -m src.analyze         --config config/main_gpt4o.yaml                              # original-judge tables/figures
 python -m src.analyze         --config config/main_gpt4o.yaml --second-judge gpt-4.1-mini  # agreement, tie-break, majority B(L)
-python -m src.figures_writeup --config config/main_gpt4o.yaml                              # the four figures above
+python -m src.figures_writeup --config config/main_gpt4o.yaml                              # the figures above
 ```
 
 These read stored data only and make no API calls. Every prompt, response, judge output and API
